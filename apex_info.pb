@@ -72,6 +72,16 @@ $
 com.android.wifi”ητ« € (”ητ«
 
 com.android.compos(
+
+com.android.vndk.v30
+
+com.android.vndk.v31
+
+com.android.vndk.v32
+
+com.android.vndk.v33
+
+com.android.vndk.v34
 
 com.android.hardware.cas(
 '
