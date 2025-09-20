@@ -4,7 +4,7 @@
 
 com.android.bt–σ«(–σ«
 -
-com.android.crashrecovery–σ« €ΰ(–σ«
+com.android.crashrecovery–σ« €€(–σ«
 
 com.android.devicelock(
 
@@ -72,16 +72,16 @@ $
 com.android.wifi”ητ« € (”ητ«
 
 com.android.compos(
-
-com.android.vndk.v30
-
-com.android.vndk.v31
-
-com.android.vndk.v32
-
-com.android.vndk.v33
-
-com.android.vndk.v34
+
+com.android.vndk.v30(
+
+com.android.vndk.v31(
+
+com.android.vndk.v32(
+
+com.android.vndk.v33(
+
+com.android.vndk.v34(
 
 com.android.hardware.cas(
 '
