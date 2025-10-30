@@ -1,19 +1,19 @@
 
 ç
-odm	2,0,73175ro.odm.build.fingerprint"aREDMAGIC/NX809J-UN/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20251025.010312:user/release-keys
+odm	2,0,73175ro.odm.build.fingerprint"aREDMAGIC/NX809J-UN/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20251030.204617:user/release-keys
 ñ
 product
-2,0,592420ro.product.build.fingerprint"aREDMAGIC/NX809J-UN/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20251024.234940:user/release-keys
+2,0,592429ro.product.build.fingerprint"aREDMAGIC/NX809J-UN/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20251030.202614:user/release-keys
 ï
-system2,0,1383755ro.system.build.fingerprint"aREDMAGIC/NX809J-UN/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20251024.234940:user/release-keys
+system2,0,1391289ro.system.build.fingerprint"aREDMAGIC/NX809J-UN/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20251030.202614:user/release-keys
 ú
-system_dlkm2,0,1999 ro.system_dlkm.build.fingerprint"aREDMAGIC/NX809J-UN/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20251025.010312:user/release-keys
+system_dlkm2,0,1999 ro.system_dlkm.build.fingerprint"aREDMAGIC/NX809J-UN/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20251030.204617:user/release-keys
 ú
 
 system_ext
-2,0,269884ro.system_ext.build.fingerprint"aREDMAGIC/NX809J-UN/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20251024.234940:user/release-keys
+2,0,270168ro.system_ext.build.fingerprint"aREDMAGIC/NX809J-UN/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20251030.202614:user/release-keys
 î
 vendor
-2,0,310789ro.vendor.build.fingerprint"aREDMAGIC/NX809J-UN/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20251025.010312:user/release-keys
+2,0,316522ro.vendor.build.fingerprint"aREDMAGIC/NX809J-UN/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20251030.204617:user/release-keys
 ú
-vendor_dlkm2,0,6536 ro.vendor_dlkm.build.fingerprint"aREDMAGIC/NX809J-UN/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20251025.010312:user/release-keys
+vendor_dlkm2,0,6537 ro.vendor_dlkm.build.fingerprint"aREDMAGIC/NX809J-UN/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20251030.204617:user/release-keys
