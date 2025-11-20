@@ -44,7 +44,7 @@ $
 
 com.android.os.statsdŸ–ó«
 %
-com.android.permissionŸ–ó« €à¶
+com.android.permissionŸ–ó« €À¶
 #
 com.android.profilingŸ–ó« €à~
 !
@@ -69,7 +69,7 @@ $
 
 com.android.virt
 
-com.android.wifiŸ–ó« €€Ò
+com.android.wifiŸ–ó« € Ò
 
 com.android.compos
 
