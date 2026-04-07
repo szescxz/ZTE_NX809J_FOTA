@@ -1,0 +1,24 @@
+variables:
+  FOTA_URL:
+    value: ""
+    description: "URL of the FOTA Package"
+  GIT_BRANCH:
+    value: ""
+    description: Branch name of the git repository
+  MASK_URL_AND_SKIP_RELEASE:
+    value: "false"
+    options:
+      - "true"
+      - "false"
+    description: Mask sensitive parts of the URL and do not create a release
+
+process:
+  only:
+    - web
+  image: python:3-alpine
+  script:
+    - apk update && apk add bash git grep
+    - if [ "$MASK_URL_AND_SKIP_RELEASE" != "false" ]; then bash fota_url_masker.sh; fi
+    - git clone -b $GIT_BRANCH $CI_REPOSITORY_URL repo
+    - pip install --root-user-action=ignore -r requirements.txt
+    - echo "$FOTA_URL" && python -u process.py "$FOTA_URL" repo

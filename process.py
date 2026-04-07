@@ -27,7 +27,7 @@ FILES_TO_EXTRACT = [
     "care_map.pb"
 ]
 GITHUB_REPOSITORY = os.environ.get("GITHUB_REPOSITORY", "szescxz/ZTE_NX769J_FOTA")
-GITHUBUSERCONTENT_HTTP_HEADERS = {
+RAW_CONTENT_HTTP_HEADERS = {
     "user-agent": "curl/8.10.1"
 }
 GIT_USER_NAME = "ZTE"
@@ -141,7 +141,7 @@ def update_tracking_repository(repo_folder, ota_url):
         
         git_commit(repo_folder, ota_build_props)
 
-def add_package_to_github_release(ota_name, dd_url):
+def add_package_to_release(ota_name, dd_url):
     with requests.Session() as session:
         def github_req(method, url_or_uri, headers={}, data=None, json=None):
             headers = dict(headers)
@@ -178,6 +178,33 @@ def add_package_to_github_release(ota_name, dd_url):
 
                 return
 
+        def gitlab_req(method, uri, headers={}, data=None, json=None):
+            headers = dict(headers)
+            headers.update({
+                "JOB-TOKEN": os.environ.get("CI_JOB_TOKEN")
+            })
+
+            return session.request(method, f"{os.environ.get('CI_API_V4_URL')}{uri}", headers=headers, data=data, json=json)
+
+        def gitlab_iterate_request(uri):
+            while True:
+                resp = gitlab_req("GET", uri)
+                resp.raise_for_status()
+                for package in resp.json():
+                    yield package
+                if "link" in resp.headers:
+                    for i in resp.headers["link"].split(","):
+                        link = i.strip()
+
+                        if 'rel="next"' in link:
+                            break
+
+                    if 'rel="next"' in link:
+                        uri = re.match(rf'<(https://{os.environ.get("CI_API_V4_URL")}/.+)>', link).group(1)
+                        continue
+
+                return
+
         print("Reading OTA information")
         dd = DownloadDescriptor(dd_url)
 
@@ -195,6 +222,8 @@ def add_package_to_github_release(ota_name, dd_url):
             ota_payload_properties = load_props(resp.content)
 
         ota_hashers = {
+            "md5": hashlib.md5(),
+            "sha1": hashlib.sha1(),
             "sha256": hashlib.sha256()
         }
 
@@ -223,7 +252,16 @@ def add_package_to_github_release(ota_name, dd_url):
                 print(f"{alg}:{hasher.hexdigest()}")
 
             print("Validating OTA package")
-            verify_package(temp_file, temp_file.tell(), HttpFile(f"https://github.com/{GITHUB_REPOSITORY}/raw/refs/heads/_certs/otacerts.zip"))
+            if os.environ.get("GITLAB_CI", None) == "true":
+                with tempfile.TemporaryFile() as certs_zip:
+                    certs_zip.write(session.get(
+                        f"{os.environ.get('CI_PROJECT_URL')}/-/raw/_certs/otacerts.zip?ref_type=heads&inline=false",
+                        headers=RAW_CONTENT_HTTP_HEADERS
+                    ).content)
+                    certs_zip.seek(0)
+                    verify_package(temp_file, temp_file.tell(), certs_zip)
+            else:
+                verify_package(temp_file, temp_file.tell(), HttpFile(f"https://github.com/{GITHUB_REPOSITORY}/raw/refs/heads/_certs/otacerts.zip"))
 
             temp_file.seek(0)
 
@@ -252,9 +290,13 @@ def add_package_to_github_release(ota_name, dd_url):
                 #assert package_build_prop["ro.build.display.id"] == target_version
                 sw_internal_version = package_build_prop["ro.build.sw_internal_version"]
 
+                if os.environ.get("GITLAB_CI", None) == "true":
+                    url = f"{os.environ.get('CI_PROJECT_URL')}/-/raw/{sw_internal_version}/build.prop?ref_type=tags&inline=false"
+                else:
+                    url = f"https://github.com/{GITHUB_REPOSITORY}/raw/{sw_internal_version}/build.prop"
                 with session.get(
-                    f"https://github.com/{GITHUB_REPOSITORY}/raw/{sw_internal_version}/build.prop",
-                    headers=GITHUBUSERCONTENT_HTTP_HEADERS
+                    url,
+                    headers=RAW_CONTENT_HTTP_HEADERS
                 ) as resp:
                     if resp.status_code == 403:
                         print(resp.text)
@@ -264,9 +306,13 @@ def add_package_to_github_release(ota_name, dd_url):
 
                 package_metadata = load_props(ota_file.read("META-INF/com/android/metadata"))
                 assert package_metadata["post-build"] == package_build_prop["ro.system.build.fingerprint"]
+                if os.environ.get("GITLAB_CI", None) == "true":
+                    url = f"{os.environ.get('CI_PROJECT_URL')}/-/raw/{ota_name.split('_TO_')[0]}/build.prop?ref_type=tags&inline=false"
+                else:
+                    url = f"https://github.com/{GITHUB_REPOSITORY}/raw/{ota_name.split('_TO_')[0]}/build.prop"
                 with session.get(
-                    f"https://github.com/{GITHUB_REPOSITORY}/raw/{ota_name.split('_TO_')[0]}/build.prop",
-                    headers=GITHUBUSERCONTENT_HTTP_HEADERS
+                    url,
+                    headers=RAW_CONTENT_HTTP_HEADERS
                 ) as resp:
                     if resp.status_code != 404:
                         if resp.status_code == 403:
@@ -282,65 +328,141 @@ def add_package_to_github_release(ota_name, dd_url):
                 if is_downgrade:
                     assert int(ota_payload_properties.get("POWERWASH", "0")) == 1
 
-                github_release = None
-                for release in github_iterate_releases():
-                    if release["tag_name"] == sw_internal_version:
-                        github_release = release
+                repo_release = None
+                if os.environ.get("GITHUB_ACTIONS", None) == "true":
+                    # GitHub supports drafting releases, so we will need to list all releases here to include drafted releases
+                    for release in github_iterate_releases():
+                        if release["tag_name"] == sw_internal_version:
+                            repo_release = release
+                            break
+                elif os.environ.get("GITLAB_CI", None) == "true":
+                    resp = gitlab_req("GET", f"/projects/{os.environ.get('CI_PROJECT_ID')}/releases/{sw_internal_version}")
+                    if resp.status_code == 404:
+                        pass
+                    else:
+                        resp.raise_for_status()
+                        repo_release = resp.json()
+                else:
+                    raise NotImplementedError
 
-                if github_release is None:
-                    github_release_notes = f"📅 {package_build_prop['ro.build.date']}"
+                if repo_release is None:
+                    repo_release_notes = f"📅 {package_build_prop['ro.build.date']}"
 
                     if not is_full_ota:
                         if IS_REDMAGIC:
                             full_ota_url = redmagic_probe_full_ota_url(DEVICE_MODELS, package_build_prop["ro.build.display.id"], package_build_prop["ro.build.sw_internal_version"])
                             if full_ota_url is not None:
-                                github_release_notes += f"\n{full_ota_url}"
+                                repo_release_notes += f"\n{full_ota_url}"
                 else:
-                    github_release_notes = github_release["body"].strip()
+                    if os.environ.get("GITHUB_ACTIONS", None) == "true":
+                        repo_release_notes = repo_release["body"].strip()
+                    elif os.environ.get("GITLAB_CI", None) == "true":
+                        repo_release_notes = repo_release["description"].strip()
+                    else:
+                        raise NotImplementedError
 
                 package_release_notes = "<details>"
                 package_release_notes += f'<summary><a href="{html.escape(ota_url)}"><code>{html.escape(ota_name)}</code></a>{"⚠️" if is_downgrade else ""}</summary>'
                 package_release_notes += release_notes
                 package_release_notes += "</details>"
 
-                if package_release_notes in github_release_notes:
+                if package_release_notes in repo_release_notes:
                     print("Release notes already uploaded")
-                elif ota_name in github_release_notes:
+                elif ota_name in repo_release_notes:
                     raise NotImplementedError
                 else:
                     # TODO: try to fetch in other languages (e.g. _ja_jp.dd, _it_it.dd)
-                    github_release_notes += "\n\n"
-                    github_release_notes += package_release_notes
+                    repo_release_notes += "\n\n"
+                    repo_release_notes += package_release_notes
 
-                release_json = {
-                    "tag_name": sw_internal_version,
-                    "name": package_build_prop["ro.build.display.id"],
-                    "body": github_release_notes.strip(),
-                    "draft": True if github_release is None else github_release["draft"],
-                    "make_latest": "false"
-                }
-                if github_release is None:
-                    resp = github_req("POST", f"/repos/{GITHUB_REPOSITORY}/releases", json=release_json)
-                    resp.raise_for_status()
-                    github_release = resp.json()
-                elif github_release["body"].strip() != github_release_notes.strip():
-                    resp = github_req("PATCH", f'/repos/{GITHUB_REPOSITORY}/releases/{github_release["id"]}', json=release_json)
-                    resp.raise_for_status()
-                    github_release = resp.json()
+                if os.environ.get("GITHUB_ACTIONS", None) == "true":
+                    release_json = {
+                        "tag_name": sw_internal_version,
+                        "name": package_build_prop["ro.build.display.id"],
+                        "body": repo_release_notes.strip(),
+                        "draft": True if repo_release is None else repo_release["draft"],
+                        "make_latest": "false"
+                    }
+                    if repo_release is None:
+                        resp = github_req("POST", f"/repos/{GITHUB_REPOSITORY}/releases", json=release_json)
+                        resp.raise_for_status()
+                        repo_release = resp.json()
+                    elif repo_release["body"].strip() != repo_release_notes.strip():
+                        resp = github_req("PATCH", f'/repos/{GITHUB_REPOSITORY}/releases/{repo_release["id"]}', json=release_json)
+                        resp.raise_for_status()
+                        repo_release = resp.json()
+                elif os.environ.get("GITLAB_CI", None) == "true":
+                    release_json = {
+                        "name": package_build_prop["ro.build.display.id"],
+                        "tag_name": sw_internal_version,
+                        "description": repo_release_notes.strip(),
+                        "released_at": dateutil.parser.parse(package_build_prop["ro.build.date"], tzinfos=TZINFOS).isoformat()
+                    }
+                    if repo_release is None:
+                        resp = gitlab_req("POST", f"/projects/{os.environ.get('CI_PROJECT_ID')}/releases", json=release_json)
+                        resp.raise_for_status()
+                        repo_release = resp.json()
+                    elif repo_release["description"].strip() != repo_release_notes.strip():
+                        resp = gitlab_req("PUT", f"/projects/{os.environ.get('CI_PROJECT_ID')}/releases/{sw_internal_version}", json=release_json)
+                        resp.raise_for_status()
+                        repo_release = resp.json()
+                else:
+                    raise NotImplementedError
 
             print("Uploading OTA package")
 
             temp_file.seek(0)
             asset_name = ota_url.split("/")[-1]
-            uploaded_assets = [asset["name"] for asset in github_release["assets"]]
+            if os.environ.get("GITHUB_ACTIONS", None) == "true":
+                uploaded_assets = [asset["name"] for asset in repo_release["assets"]]
+            elif os.environ.get("GITLAB_CI", None) == "true":
+                uploaded_assets = [asset["name"] for asset in repo_release["assets"]["links"]]
+            else:
+                raise NotImplementedError
             if asset_name in uploaded_assets:
                 print("OTA package already uploaded")
             else:
-                resp = github_req("POST", github_release["upload_url"].replace("{?name,label}", f"?name={asset_name}"), headers={"Content-Type": "application/zip"}, data=temp_file)
-                resp.raise_for_status()
-                digest = resp.json()["digest"]
-                digest_alg, digest_value = digest.split(":")
-                assert ota_hashers[digest_alg].hexdigest() == digest_value
+                if os.environ.get("GITHUB_ACTIONS", None) == "true":
+                    resp = github_req("POST", repo_release["upload_url"].replace("{?name,label}", f"?name={asset_name}"), headers={"Content-Type": "application/zip"}, data=temp_file)
+                    resp.raise_for_status()
+                    digest = resp.json()["digest"]
+                    digest_alg, digest_value = digest.split(":")
+                    assert ota_hashers[digest_alg].hexdigest() == digest_value
+                elif os.environ.get("GITLAB_CI", None) == "true":
+                    resp = gitlab_req("PUT", f"/projects/{os.environ.get('CI_PROJECT_ID')}/packages/generic/{os.environ.get('GIT_BRANCH')}/{sw_internal_version}/{asset_name}", headers={"Content-Type": "application/zip"}, data=temp_file)
+                    resp.raise_for_status()
+                    package_id = None
+                    for package in gitlab_iterate_request(f"/projects/{os.environ.get('CI_PROJECT_ID')}/packages"):
+                        if package["name"] == os.environ.get('GIT_BRANCH') and package["version"] == sw_internal_version:
+                            package_id = package["id"]
+                            break
+                    assert package_id is not None
+                    while package["status"] == "processing":
+                        print("Waiting for server to process the package")
+                        time.sleep(5)
+                        resp = gitlab_req("GET", f"/projects/{os.environ.get('CI_PROJECT_ID')}/packages/{package_id}")
+                        resp.raise_for_status()
+                        package = resp.json()
+                    digest_validated = False
+                    for package_file in gitlab_iterate_request(f"/projects/{os.environ.get('CI_PROJECT_ID')}/packages/{package_id}/package_files"):
+                        if package_file["file_name"] == asset_name:
+                            for digest_alg, digest_value in ota_hashers.items():
+                                actual_value = package_file[f"file_{digest_alg}"]
+                                if actual_value is None:
+                                    warnings.warn(f"Server not providing {digest_alg} digest")
+                                else:
+                                    assert digest_value.hexdigest() == actual_value
+                                    digest_validated = True
+                            break
+                    assert digest_validated
+                    resp = gitlab_req("POST", f"/projects/{os.environ.get('CI_PROJECT_ID')}/releases/{sw_internal_version}/assets/links", json={
+                        "name": asset_name,
+                        "url": f"{os.environ.get('CI_PROJECT_URL')}/-/package_files/{package_file['id']}/download",
+                        "link_type": "package"
+                    })
+                    resp.raise_for_status()
+                else:
+                    raise NotImplementedError
 
 def main():
     url = sys.argv[1]
@@ -373,7 +495,10 @@ def main():
     else:
         update_tracking_repository(repo_folder, ota_url)
 
-    add_package_to_github_release(ota_name, dd_url)
+    if os.environ.get("MASK_URL_AND_SKIP_RELEASE", "false") != "false":
+        print("Skipping release upload")
+    else:
+        add_package_to_release(ota_name, dd_url)
 
 if __name__ == "__main__":
     main()
