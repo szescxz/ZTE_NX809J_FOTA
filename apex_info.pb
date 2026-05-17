@@ -32,9 +32,9 @@ $
 &
 com.android.mediaŸ–ó« €€ƒ(Ÿ–ó«
 .
-com.android.media.swcodecŸ–ó« €Àú(Ÿ–ó«
+com.android.media.swcodecŸ–ó« €àú(Ÿ–ó«
 .
-com.android.mediaproviderŸ–ó« € Ó(Ÿ–ó«
+com.android.mediaproviderŸ–ó« €€Ó(Ÿ–ó«
 /
 com.android.neuralnetworksŸ–ó« €à(Ÿ–ó«
 ,
