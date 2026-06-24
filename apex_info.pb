@@ -10,7 +10,7 @@
 
 com.android.i18n(
 ,
-com.android.nfcservicesŸ–ó« € Ò(Ÿ–ó«
+com.android.nfcservicesŸ–ó« €àÒ(Ÿ–ó«
 )
 com.android.profilingŸ–ó« € ~(Ÿ–ó«
 
