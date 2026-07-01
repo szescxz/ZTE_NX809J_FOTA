@@ -8,7 +8,7 @@
 *
 com.android.appsearchŸ–ó« €€ş(Ÿ–ó«
 $
-com.android.artŸ–ó« €ÀĞ(Ÿ–ó«
+com.android.artŸ–ó« €€Ğ(Ÿ–ó«
 
 com.android.btŸ–ó«(Ÿ–ó«
 .
@@ -34,11 +34,11 @@ $
 .
 com.android.media.swcodecŸ–ó« €àú(Ÿ–ó«
 .
-com.android.mediaproviderŸ–ó« €€Ó(Ÿ–ó«
+com.android.mediaproviderŸ–ó« € Ó(Ÿ–ó«
 /
 com.android.neuralnetworksŸ–ó« €à(Ÿ–ó«
 ,
-com.android.nfcservicesŸ–ó« €€«(Ÿ–ó«
+com.android.nfcservicesŸ–ó« €àª(Ÿ–ó«
 8
 #com.android.ondevicepersonalizationŸ–ó« €Àˆ(Ÿ–ó«
 #
@@ -69,20 +69,10 @@ $
 
 com.android.virt(
 %
-com.android.wifiŸ–ó« €ÀÒ(Ÿ–ó«
+com.android.wifiŸ–ó« € Ó(Ÿ–ó«
 
 com.android.compos(
-
-com.android.vndk.v30(
-
-com.android.vndk.v31(
-
-com.android.vndk.v32(
-
-com.android.vndk.v33(
-
-com.android.vndk.v34(
 
 com.android.hardware.cas(
 '
-com.google.android.widevineòùÛZ(òùÛZ
+com.google.android.widevine‹€ÜZ(òùÛZ
