@@ -34,11 +34,11 @@ $
 .
 com.android.media.swcodecŸ–ó« €àú(Ÿ–ó«
 .
-com.android.mediaproviderŸ–ó« €€Ó(Ÿ–ó«
+com.android.mediaproviderŸ–ó« € Ó(Ÿ–ó«
 /
 com.android.neuralnetworksŸ–ó« €à(Ÿ–ó«
 ,
-com.android.nfcservicesŸ–ó« €€«(Ÿ–ó«
+com.android.nfcservicesŸ–ó« €àª(Ÿ–ó«
 8
 #com.android.ondevicepersonalizationŸ–ó« €Àˆ(Ÿ–ó«
 #

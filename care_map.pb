@@ -1,19 +1,19 @@
 
 Š
-odm	2,0,73176ro.odm.build.fingerprint"^REDMAGIC/NX809J/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20260608.162432:user/release-keys
+odm	2,0,73177ro.odm.build.fingerprint"^REDMAGIC/NX809J/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20260701.154707:user/release-keys
 “
 product
-2,0,258477ro.product.build.fingerprint"^REDMAGIC/NX809J/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20260608.161518:user/release-keys
+2,0,259783ro.product.build.fingerprint"^REDMAGIC/NX809J/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20260701.145746:user/release-keys
 ’
-system2,0,2182903ro.system.build.fingerprint"^REDMAGIC/NX809J/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20260608.161518:user/release-keys
+system2,0,2200038ro.system.build.fingerprint"^REDMAGIC/NX809J/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20260701.145746:user/release-keys
 ™
-system_dlkm2,0,2001 ro.system_dlkm.build.fingerprint"^REDMAGIC/NX809J/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20260608.162432:user/release-keys
+system_dlkm2,0,2018 ro.system_dlkm.build.fingerprint"^REDMAGIC/NX809J/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20260701.154707:user/release-keys
 ™
 
 system_ext
-2,0,669627ro.system_ext.build.fingerprint"^REDMAGIC/NX809J/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20260608.161518:user/release-keys
+2,0,669511ro.system_ext.build.fingerprint"^REDMAGIC/NX809J/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20260701.145746:user/release-keys
 ‘
 vendor
-2,0,534954ro.vendor.build.fingerprint"^REDMAGIC/NX809J/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20260608.162432:user/release-keys
+2,0,537940ro.vendor.build.fingerprint"^REDMAGIC/NX809J/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20260701.154707:user/release-keys
 ™
-vendor_dlkm2,0,6545 ro.vendor_dlkm.build.fingerprint"^REDMAGIC/NX809J/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20260608.162432:user/release-keys
+vendor_dlkm2,0,6546 ro.vendor_dlkm.build.fingerprint"^REDMAGIC/NX809J/NX809J:16/BQ2A.250705.001-BP2A.250605.031.A3/20260701.154707:user/release-keys
